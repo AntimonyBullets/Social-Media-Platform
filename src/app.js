@@ -16,4 +16,10 @@ app.use(express.urlencoded({extended:true, limit:"16kb"})); //to parse the reque
 
 app.use(express.static("public"));
 
+
+//importing router
+import userRouter from './routes/user.route.js';
+
+app.use('/api/v1/users', userRouter);
+
 export {app};
