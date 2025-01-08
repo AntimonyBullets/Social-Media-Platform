@@ -20,6 +20,6 @@ app.use(express.static("public"));
 //importing router
 import userRouter from './routes/user.route.js';
 
-app.use('/api/v1/users', userRouter);
+app.use('/api/v1/users', userRouter); //Here app.use() middleware is used to transfer control to userRouter in the user.route.js file if a route extending /api/v1/users (for example /api/v1/users/register) is hit
 
 export {app};
