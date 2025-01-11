@@ -6,7 +6,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 const registerUser = asyncHandler(async (req,res)  =>{
     const {fullName, email, username, password} = req.body;
-    console.log(fullName, email, username, password);
     
     if(
         [fullName, email, username, password].some((field) => field?.trim() === "")
@@ -14,7 +13,7 @@ const registerUser = asyncHandler(async (req,res)  =>{
         throw new ApiError(400, "All the fields are required");
     }
 
-    const existingUser = User.findOne({
+    const existingUser = await User.findOne({
         $or: [{ username }, { email }]
     });
     if(existingUser){
@@ -34,7 +33,7 @@ const registerUser = asyncHandler(async (req,res)  =>{
         throw new ApiError(500, "Internal server error!");
     }
 
-    const userEntry = User.create({
+    const userEntry = await User.create({
         fullName,
         avatar: avatar.url,
         coverImage: coverImage?.url || "",
@@ -43,12 +42,12 @@ const registerUser = asyncHandler(async (req,res)  =>{
         username: username.toLowerCase()
     });
 
-    const createdUser = User.findById(userEntry._id).select(
-        "-password - refreshToken"
-    );
+    const createdUser = await User.findById(userEntry._id).select(
+        "-password -refreshToken"
+    )
     
     if(!createdUser){
-        throw new ApiError(500, "Internal server error!");
+        throw new ApiError(500, "Internal server error! XYZ");
     }
 
     return res.status(201).json(
