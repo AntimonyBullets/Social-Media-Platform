@@ -157,7 +157,7 @@ const logoutUser = asyncHandler(async (req, res) =>{
             new : true,
         }
     );
-
+    //here we are updating the refresh token field from the user who has requested to logout to 'undefined' (basically removing it). Note that here we have the access of req.user since we have used the 'verifyJWT' middleware (refer user.route.js) which would act just before the logout functionality to get the authorized user whose access token and refresh token must be removed.
     const options = {
         httpOnly: true,
         secure: true
@@ -165,8 +165,8 @@ const logoutUser = asyncHandler(async (req, res) =>{
 
     return res
     .status(200)
-    .clearCookie("accessToken", options)
-    .clearCookie("refreshToken", options)
+    .clearCookie("accessToken", options) //deleting the "accessToken" from cookies
+    .clearCookie("refreshToken", options)//deleting the "refreshToken" from cookies
     .json(new ApiResponse(200, {}, "User logged out!"));
 })
 
