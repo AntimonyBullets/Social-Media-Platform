@@ -173,24 +173,30 @@ const logoutUser = asyncHandler(async (req, res) =>{
 
 const refreshAccessToken = asyncHandler(async (req,res)=>{
     try {
+        //retrieving the refresh token either from cookies or from request body
         const incomingRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
     
+        //if not received, throwing error
         if(!incomingRefreshToken){
             throw new ApiError(401, "Unauthorized request");
         };
     
+        //Verifying if the 'token' is correct and returning the data (in 'decodedToken') which was initially used to generate the access token.
         const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
     
+        //finding the user with his '_id' which we have acquired from 'decodedToken' so that we get access to refresh token saved in user's document in the database.
         const user = await User.findById(decodedToken?._id);
     
         if(!user){
             throw new ApiError(401, "Unauthorized request, user with given token not found!");
         }
     
+        //matching the token acquired from the request with the refresh token saved in user's document in the database
         if(incomingRefreshToken !== user?.refreshToken){
             throw new ApiError(401, "Invalid refresh token!");
         }
     
+        //generating new access and refresh tokens
         const {accessToken, refreshToken} = generateAccessAndRefreshTokens(user._id);
     
         const options = {
