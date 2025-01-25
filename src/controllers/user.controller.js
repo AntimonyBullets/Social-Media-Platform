@@ -5,8 +5,8 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 
-const generateAccessAndRefreshTokens = async (userId)=>{
-    
+const generateAccessAndRefreshTokens = async (userId) => {
+
     try {
         const user = await User.findById(userId);
         const accessToken = user.generateAccessToken(); //we don't need 'await' here since the method acts synchronously
@@ -17,16 +17,16 @@ const generateAccessAndRefreshTokens = async (userId)=>{
         await user.save({ validateBeforeSave: false });
         //saving the changes made in 'refreshToken' in the database. Here 'validateBeforeSave' is set to false so that required fields such as password which are needed each time you save won't become an issue
 
-        return {accessToken, refreshToken};
+        return { accessToken, refreshToken };
     } catch (error) {
         throw new ApiError(500, "Something went wrong while generating the tokens.")
     }
 
 }
 
-const registerUser = asyncHandler(async (req,res)  =>{
-    const {fullName, email, username, password} = req.body;
-    
+const registerUser = asyncHandler(async (req, res) => {
+    const { fullName, email, username, password } = req.body;
+
     //Checking if all the required fields are sent and are not empty strings and throwing error otherwise.
     if (
         [fullName, email, username, password].some((field) => !field || field.trim() === "")
@@ -38,10 +38,10 @@ const registerUser = asyncHandler(async (req,res)  =>{
     const existingUser = await User.findOne({
         $or: [{ username }, { email }]
     });
-    if(existingUser){
+    if (existingUser) {
         throw new ApiError(409, "User already exists");
     }
-    
+
     //Getting the path of the files in variables if they are successfully uploaded. If they're not successfully uploaded, we'll get 'undefined' stored in the variables. 
     const avatarLocalPath = req.files?.avatar?.[0].path;
 
@@ -55,14 +55,14 @@ const registerUser = asyncHandler(async (req,res)  =>{
 
 
     //throwing error if 'avatar' is not provided 
-    if(!avatarLocalPath){
+    if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar is required")
     }
 
     const avatar = await uploadOnCloudinary(avatarLocalPath);
     const coverImage = await uploadOnCloudinary(coverImageLocalPath); //here if coverImageLocalPath is 'undefined' then the function would return 'null' value, which is later being handled while creating databse entry
 
-    if(!avatar){
+    if (!avatar) {
         throw new ApiError(500, "Internal server error!");
     }
 
@@ -79,9 +79,9 @@ const registerUser = asyncHandler(async (req,res)  =>{
     const createdUser = await User.findById(userEntry._id).select(
         "-password -refreshToken"
     )//removing password nad refreshtoken from the response
-    
+
     //checking if the user's entry has successfully been created in the database.
-    if(!createdUser){
+    if (!createdUser) {
         throw new ApiError(500, "Internal server error! XYZ");
     }
 
@@ -92,33 +92,33 @@ const registerUser = asyncHandler(async (req,res)  =>{
 
 })
 
-const loginUser = asyncHandler(async (req,res)=>{
+const loginUser = asyncHandler(async (req, res) => {
 
-    const {email, username, password} = req.body;
+    const { email, username, password } = req.body;
 
     //checking if at least one of the detail (username or email) is provided.
-    if(!username && !email){
+    if (!username && !email) {
         throw new ApiError(400, "Username or Email is required!")
     }
 
     //finding the user with given email/username
     const user = await User.findOne({
-        $or : [{ email }, { username }]
+        $or: [{ email }, { username }]
     })
 
-    if(!user){
-        throw new ApiError(404, "User does not exist"); 
+    if (!user) {
+        throw new ApiError(404, "User does not exist");
     }
 
     //checking if the password entered by the user is correct or not
     const passwordCheck = await user.isPasswordCorrect(password);
 
-    if(!passwordCheck){
-        throw new ApiError(401, "Incorrect password!"); 
+    if (!passwordCheck) {
+        throw new ApiError(401, "Incorrect password!");
     }
 
     // generating access and refresh tokens after successful password validation.
-    const {accessToken, refreshToken} = await generateAccessAndRefreshTokens(user._id);
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
 
     // retrieving the data of the user (excluding password and refreshToken) which is to be sent in response 
     const loggedInUser = await User.findById(user._id).select(
@@ -132,30 +132,30 @@ const loginUser = asyncHandler(async (req,res)=>{
     }
 
     return res
-    .status(200)
-    .cookie("accessToken", accessToken, options) //sending accessToken as a cookie
-    .cookie("refreshToken", refreshToken, options) //sending refreshToken as a cookie
-    .json(
-        new ApiResponse(
-            200,
-            {user: loggedInUser, accessToken, refreshToken}
-            //explicitly sending accessToken and refreshToken in the response in case user wants to store them locally
-            ,
-            "User has logged in!"
+        .status(200)
+        .cookie("accessToken", accessToken, options) //sending accessToken as a cookie
+        .cookie("refreshToken", refreshToken, options) //sending refreshToken as a cookie
+        .json(
+            new ApiResponse(
+                200,
+                { user: loggedInUser, accessToken, refreshToken }
+                //explicitly sending accessToken and refreshToken in the response in case user wants to store them locally
+                ,
+                "User has logged in!"
+            )
         )
-    )
 });
 
-const logoutUser = asyncHandler(async (req, res) =>{
+const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set:{
+            $set: {
                 refreshToken: undefined,
             }
         },
         {
-            new : true,
+            new: true,
         }
     );
     //here we are updating the refresh token field from the user who has requested to logout to 'undefined' (basically removing it). Note that here we have the access of req.user since we have used the 'verifyJWT' middleware (refer user.route.js) which would act just before the logout functionality to get the authorized user whose access token and refresh token must be removed.
@@ -165,55 +165,78 @@ const logoutUser = asyncHandler(async (req, res) =>{
     }
 
     return res
-    .status(200)
-    .clearCookie("accessToken", options) //deleting the "accessToken" from cookies
-    .clearCookie("refreshToken", options)//deleting the "refreshToken" from cookies
-    .json(new ApiResponse(200, {}, "User logged out!"));
+        .status(200)
+        .clearCookie("accessToken", options) //deleting the "accessToken" from cookies
+        .clearCookie("refreshToken", options)//deleting the "refreshToken" from cookies
+        .json(new ApiResponse(200, {}, "User logged out!"));
 })
 
-const refreshAccessToken = asyncHandler(async (req,res)=>{
+const refreshAccessToken = asyncHandler(async (req, res) => {
     try {
         //retrieving the refresh token either from cookies or from request body
         const incomingRefreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
-    
+
         //if not received, throwing error
-        if(!incomingRefreshToken){
+        if (!incomingRefreshToken) {
             throw new ApiError(401, "Unauthorized request");
         };
-    
+
         //Verifying if the 'token' is correct and returning the data (in 'decodedToken') which was initially used to generate the access token.
         const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
-    
+
         //finding the user with his '_id' which we have acquired from 'decodedToken' so that we get access to refresh token saved in user's document in the database.
         const user = await User.findById(decodedToken?._id);
-    
-        if(!user){
+
+        if (!user) {
             throw new ApiError(401, "Unauthorized request, user with given token not found!");
         }
-    
+
         //matching the token acquired from the request with the refresh token saved in user's document in the database
-        if(incomingRefreshToken !== user?.refreshToken){
+        if (incomingRefreshToken !== user?.refreshToken) {
             throw new ApiError(401, "Invalid refresh token!");
         }
-    
+
         //generating new access and refresh tokens
-        const {accessToken, refreshToken} = generateAccessAndRefreshTokens(user._id);
-    
+        const { accessToken, refreshToken } = generateAccessAndRefreshTokens(user._id);
+
         const options = {
             httpOnly: true,
             secure: true
         };
-    
+
         return res
-        .status(200)
-        .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", refreshToken, options)
-        .json(
-            new ApiResponse(200, {accessToken, refreshToken}, "Access Token refreshed!")
-        );  
+            .status(200)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", refreshToken, options)
+            .json(
+                new ApiResponse(200, { accessToken, refreshToken }, "Access Token refreshed!")
+            );
     } catch (error) {
         throw new ApiError(401, error?.message || "Invalid refresh token!")
     }
 })
 
-export {registerUser, loginUser, logoutUser,refreshAccessToken};
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+    const {newPassword, currentPassword} = req.body;
+
+    if(!newPassword || !currentPassword){
+        throw new ApiError("All fields are required");
+    };
+
+    const user = await User.findById(req.user._id); //we'll be using 'verifyJWT' (the authentication middleware) which will give us access to 'req.user'
+
+    const isPasswordValid = await user.isPasswordCorrect(currentPassword); //checking if the user has filled the current password correctly.
+
+    if(!isPasswordValid){
+        throw new ApiError("Incorrect password.")
+    }
+
+    user.password = newPassword;
+    await user.save({validateBeforeSave: false}); // here 'pre' middleware acts just before the document is saved in database and encrypts the password before it gets saved (this functionality is defined in user.model.js);
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password changes successfully!"))
+})
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword };
