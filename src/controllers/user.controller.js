@@ -220,7 +220,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     const {newPassword, currentPassword} = req.body;
 
     if(!newPassword || !currentPassword){
-        throw new ApiError("All fields are required");
+        throw new ApiError(400, "All fields are required");
     };
 
     const user = await User.findById(req.user._id); //we'll be using 'verifyJWT' (the authentication middleware) which will give us access to 'req.user'
@@ -228,7 +228,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     const isPasswordValid = await user.isPasswordCorrect(currentPassword); //checking if the user has filled the current password correctly.
 
     if(!isPasswordValid){
-        throw new ApiError("Incorrect password.")
+        throw new ApiError(401,"Incorrect password.")
     }
 
     user.password = newPassword;
@@ -239,4 +239,94 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password changes successfully!"))
 })
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword };
+const getCurrentUser = asyncHandler(async (req, res)=>{
+    // 1 middleware (auth) will act before this function to get access of req.user
+    return res
+    .status(200)
+    .json(new ApiResponse(200, req.user, "Current user fetched successfully!"));
+})
+
+const updateAccountDetails = asyncHandler(async (req,res)=>{
+    // 1 middleware (auth) will act before this function to get access of req.user
+    const {fullName} = req.body;
+
+    if(!fullName){
+        throw new ApiError("fullName is required")
+    }
+
+    const user = await User.findByIdAndUpdate(req.user._id, {
+        $set:{
+            fullName
+        },
+    },
+    {new: true}).select("-password");
+
+    if(!user){
+        throw new ApiError("User does not exist");
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Full name is updated successfully"))
+})
+
+const updateUserAvatar = asyncHandler(async (req, res)=>{
+    // 2 middlewares (multer and auth) will act before this function to get access of req.file and req.user
+    const avatarLocalPath = req.file?.path;
+
+    if(!avatarLocalPath){
+        throw new ApiError(400, "Avatar is required");
+    }
+
+    const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+    if(!avatar || !avatar.url){
+        throw new ApiError(500,"Internal sever error while uploading process");
+    }
+    
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set: {
+                avatar: avatar?.url
+            }
+        },
+        { new: true }
+    ).select("-password");
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User's avatar updated successfully"));
+})
+
+const updateUserCoverImage = asyncHandler(async (req, res)=>{
+    //same logic as updateUserAvatar
+    const coverImageLocalPath = req.file?.path;
+
+    if(!coverImageLocalPath){
+        throw new ApiError(400, "Cover image is required");
+    }
+
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+
+    if(!coverImage || !coverImage.url){
+        throw new ApiError(500,"Internal sever error while uploading process");
+    }
+    
+    const user = await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set: {
+                coverImage: coverImage?.url
+            }
+        },
+        { new: true }
+    ).select("-password");
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User's cover image has been updated successfully"));
+})
+
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails,updateUserAvatar,updateUserCoverImage };
