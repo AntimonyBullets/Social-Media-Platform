@@ -217,9 +217,9 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 })
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {
-    const {newPassword, currentPassword} = req.body;
+    const { newPassword, currentPassword } = req.body;
 
-    if(!newPassword || !currentPassword){
+    if (!newPassword || !currentPassword) {
         throw new ApiError(400, "All fields are required");
     };
 
@@ -227,63 +227,63 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 
     const isPasswordValid = await user.isPasswordCorrect(currentPassword); //checking if the user has filled the current password correctly.
 
-    if(!isPasswordValid){
-        throw new ApiError(401,"Incorrect password.")
+    if (!isPasswordValid) {
+        throw new ApiError(401, "Incorrect password.")
     }
 
     user.password = newPassword;
-    await user.save({validateBeforeSave: false}); // here 'pre' middleware acts just before the document is saved in database and encrypts the password before it gets saved (this functionality is defined in user.model.js);
+    await user.save({ validateBeforeSave: false }); // here 'pre' middleware acts just before the document is saved in database and encrypts the password before it gets saved (this functionality is defined in user.model.js);
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, {}, "Password changes successfully!"))
+        .status(200)
+        .json(new ApiResponse(200, {}, "Password changes successfully!"))
 })
 
-const getCurrentUser = asyncHandler(async (req, res)=>{
+const getCurrentUser = asyncHandler(async (req, res) => {
     // 1 middleware (auth) will act before this function to get access of req.user
     return res
-    .status(200)
-    .json(new ApiResponse(200, req.user, "Current user fetched successfully!"));
+        .status(200)
+        .json(new ApiResponse(200, req.user, "Current user fetched successfully!"));
 })
 
-const updateAccountDetails = asyncHandler(async (req,res)=>{
+const updateAccountDetails = asyncHandler(async (req, res) => {
     // 1 middleware (auth) will act before this function to get access of req.user
-    const {fullName} = req.body;
+    const { fullName } = req.body;
 
-    if(!fullName){
+    if (!fullName) {
         throw new ApiError("fullName is required")
     }
 
     const user = await User.findByIdAndUpdate(req.user._id, {
-        $set:{
+        $set: {
             fullName
         },
     },
-    {new: true}).select("-password");
+        { new: true }).select("-password");
 
-    if(!user){
+    if (!user) {
         throw new ApiError("User does not exist");
     }
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, user, "Full name is updated successfully"))
+        .status(200)
+        .json(new ApiResponse(200, user, "Full name is updated successfully"))
 })
 
-const updateUserAvatar = asyncHandler(async (req, res)=>{
+const updateUserAvatar = asyncHandler(async (req, res) => {
     // 2 middlewares (multer and auth) will act before this function to get access of req.file and req.user
     const avatarLocalPath = req.file?.path;
 
-    if(!avatarLocalPath){
+    if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar is required");
     }
 
     const avatar = await uploadOnCloudinary(avatarLocalPath);
 
-    if(!avatar || !avatar.url){
-        throw new ApiError(500,"Internal sever error while uploading process");
+    if (!avatar || !avatar.url) {
+        throw new ApiError(500, "Internal sever error while uploading process");
     }
-    
+
     const user = await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -295,24 +295,24 @@ const updateUserAvatar = asyncHandler(async (req, res)=>{
     ).select("-password");
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, user, "User's avatar updated successfully"));
+        .status(200)
+        .json(new ApiResponse(200, user, "User's avatar updated successfully"));
 })
 
-const updateUserCoverImage = asyncHandler(async (req, res)=>{
+const updateUserCoverImage = asyncHandler(async (req, res) => {
     //same logic as updateUserAvatar
     const coverImageLocalPath = req.file?.path;
 
-    if(!coverImageLocalPath){
+    if (!coverImageLocalPath) {
         throw new ApiError(400, "Cover image is required");
     }
 
     const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
-    if(!coverImage || !coverImage.url){
-        throw new ApiError(500,"Internal sever error while uploading process");
+    if (!coverImage || !coverImage.url) {
+        throw new ApiError(500, "Internal sever error while uploading process");
     }
-    
+
     const user = await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -324,78 +324,93 @@ const updateUserCoverImage = asyncHandler(async (req, res)=>{
     ).select("-password");
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, user, "User's cover image has been updated successfully"));
+        .status(200)
+        .json(new ApiResponse(200, user, "User's cover image has been updated successfully"));
 })
 
-const getUserChannelProfile = asyncHandler(async (req,res)=>{
-    const {username} = req.params;
+const getUserChannelProfile = asyncHandler(async (req, res) => {
+    const { username } = req.params;
+    //req.params refer to the route parameters. These parameters are part of the URL and are used to capture values dynamically
 
-    if(!username){
+    if (!username) {
         throw new ApiError(401, "User does not exist");
-    }
+    }// throwing error if we get no username from req.params
+
+    /*An aggregation pipeline consists of one or more stages that process documents:
+
+    Each stage performs an operation on the input documents. For example, a stage can filter documents, group documents, and calculate values.
+
+    The documents that are output from a stage are passed to the next stage.
+
+    An aggregation pipeline can return results for groups of documents. For example, return the total, average, maximum, and minimum values.*/
 
     const channel = await User.aggregate([
         {
-            $match: {username : username?.toLowerCase()}
+            //first stage
+            $match: { username: username?.toLowerCase() }
+            //matching the document in the database which has the username same as the username taken from req.params and passing that document to the next stage. Since usernames are unique only a single document will be passed to the next stage.
         },
         {
-            $lookup:{
+            $lookup: {
                 from: "subscriptions",
                 localField: "_id",
                 foreignField: "channel",
                 as: "subscribers"
             }
+            //storing an array of all the documents which are contained by 'subscriptions' and whose channel field matches with the _id of local field (the document passed by previous stage) into a new field ('subscribers') in the current document.
         },
         {
-            $lookup:{
+            $lookup: {
                 from: "subscriptions",
                 localField: "_id",
                 foreignField: "subscriber",
                 as: "subscribedTo"
             }
+            //similar to previous one, this time we look for matching 'subscriber' and save all documents as array in 'subscribedTo'.
         },
         {
-            $addFields:{
-                subscribersCount:{
-                    $size: "$subscribers"
+            $addFields: {
+                subscribersCount: {
+                    $size: "$subscribers" //gives the length of the array (to find no. of subscribers) saved in 'subscribers' field of current document.
                 },
-                subscribedToCount:{
-                    $size: "$subscribedTo"
+                subscribedToCount: {
+                    $size: "$subscribedTo" //gives the length of the array saved in 'subscribedTo' (to find n. of subscriptions) field of current document.
                 },
-                isSubscribed:{
-                    $cond:{
+                isSubscribed: {
+                    $cond: {
                         if: {
                             $in: [req.user._id, "$subscribers.subscriber"]
                         },
                         then: true,
                         else: false
                     }
+                    //if the user who has requested the channel's profile details (which we get from req.user._id) is being checked if he is present in the 'subscribers' list of the user who's profile details are being requested. If that is 'true' we save true in a new field 'isSubscribed' otherwise we save false.
                 }
             }
         },
         {
-            $project:{
+            $project: {
                 fullName: 1,
                 subscribersCount: 1,
-                subscribedToCount:1,
-                isSubscribed:1,
+                subscribedToCount: 1,
+                isSubscribed: 1,
                 username: 1,
                 avatar: 1,
                 coverImage: 1,
                 email: 1
             }
+            //sets the values which are to be returned as object into 'channel' variable. All the fields which are set to 1 in $project will be returned in the 'channel' variable together as an object.
         }
-    ]) 
+    ])
 
-    if(!channel?.length){
+    if (!channel?.length) {
         throw new ApiError(404, "Channel does not exist!");
     }
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, channel[0], "User channel details successfully fetched"))
+        .status(200)
+        .json(new ApiResponse(200, channel[0], "User channel details successfully fetched"))
 })
 
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails,updateUserAvatar,updateUserCoverImage,getUserChannelProfile };
+export { registerUser, loginUser, logoutUser, refreshAccessToken, changeCurrentPassword, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannelProfile };
