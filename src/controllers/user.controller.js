@@ -260,7 +260,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
             fullName
         },
     },
-        { new: true }).select("-password");
+        { new: true }).select("-password -refreshToken");
 
     if (!user) {
         throw new ApiError(404, "User does not exist");
