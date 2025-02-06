@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
@@ -292,8 +292,18 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
                 avatar: avatar?.url
             }
         },
-        { new: true }
     ).select("-password");
+
+    if(!user) throw new ApiError(401, "Unauthorized request!")
+    
+    const deleteOriginalAvatar = await deleteFromCloudinary(user?.avatar);
+
+    if(!deleteOriginalAvatar){
+        throw new ApiError(500, "Something went wrong while deleting previous avatar");
+    }
+    console.log(deleteOriginalAvatar);
+
+    user.avatar = avatar?.url;
 
     return res
         .status(200)

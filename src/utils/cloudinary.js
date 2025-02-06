@@ -24,4 +24,25 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
-export {uploadOnCloudinary};
+const deleteFromCloudinary = async (cloudinaryURL) =>{
+    try {
+        if(!cloudinaryURL?.length) return null;
+        const pathArr = cloudinaryURL.split("/");
+        const fileNameArr = pathArr[pathArr.length - 1].split(".");
+        const fileName = fileNameArr[0];
+        const response = await cloudinary.uploader.destroy(fileName);
+    
+        if (response.result === 'ok') {
+            return {
+              success: true,
+              message: `File ${fileName} deleted successfully`
+            };
+        }
+        else {
+            throw new Error(`Failed to delete the file`);
+          }
+    } catch (error) {
+        return false;
+    }
+}
+export {uploadOnCloudinary, deleteFromCloudinary};
