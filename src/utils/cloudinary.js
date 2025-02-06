@@ -26,7 +26,8 @@ const uploadOnCloudinary = async (localFilePath) => {
 
 const deleteFromCloudinary = async (cloudinaryURL) =>{
     try {
-        if(!cloudinaryURL?.length) return null;
+        if(cloudinaryURL.length === 0) return "Nothing to delete";
+        if(!cloudinaryURL) return null;
         const pathArr = cloudinaryURL.split("/");
         const fileNameArr = pathArr[pathArr.length - 1].split(".");
         const fileName = fileNameArr[0];

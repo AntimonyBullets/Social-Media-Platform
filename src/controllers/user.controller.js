@@ -292,7 +292,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
                 avatar: avatar?.url
             }
         },
-    ).select("-password");
+    ).select("-password -refreshToken");
 
     if(!user) throw new ApiError(401, "Unauthorized request!")
     
@@ -331,8 +331,18 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
                 coverImage: coverImage?.url
             }
         },
-        { new: true }
-    ).select("-password");
+    ).select("-password -refreshToken");
+
+    if(!user) throw new ApiError(401, "Unauthorized request!")
+    
+    const deleteOriginalCoverImage = await deleteFromCloudinary(user?.coverImage);
+
+    if(!deleteOriginalCoverImage){
+        throw new ApiError(500, "Something went wrong while deleting previous avatar");
+    }
+    console.log(deleteOriginalCoverImage);
+
+    user.coverImage = coverImage?.url;
 
     return res
         .status(200)
