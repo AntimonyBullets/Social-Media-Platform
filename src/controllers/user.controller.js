@@ -252,7 +252,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     const { fullName } = req.body;
 
     if (!fullName) {
-        throw new ApiError("fullName is required")
+        throw new ApiError(400, "fullName is required")
     }
 
     const user = await User.findByIdAndUpdate(req.user._id, {
@@ -263,7 +263,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         { new: true }).select("-password");
 
     if (!user) {
-        throw new ApiError("User does not exist");
+        throw new ApiError(404, "User does not exist");
     }
 
     return res
