@@ -26,12 +26,14 @@ const uploadOnCloudinary = async (localFilePath) => {
 
 const deleteFromCloudinary = async (cloudinaryURL) =>{
     try {
-        if(cloudinaryURL.length === 0) return "Nothing to delete";
-        if(!cloudinaryURL) return null;
+        if(cloudinaryURL.length === 0) return "Nothing to delete"; // returning a truthy value if the url is an empty string 
+        if(!cloudinaryURL) return null; // returning 'null' (a falsy value) if the url does not exist
+
+        //following is the code for extracting just the filename from the cloudinary url
         const pathArr = cloudinaryURL.split("/");
         const fileNameArr = pathArr[pathArr.length - 1].split(".");
         const fileName = fileNameArr[0];
-        const response = await cloudinary.uploader.destroy(fileName);
+        const response = await cloudinary.uploader.destroy(fileName); //deleting the file
     
         if (response.result === 'ok') {
             return {
@@ -43,7 +45,7 @@ const deleteFromCloudinary = async (cloudinaryURL) =>{
             throw new Error(`Failed to delete the file`);
           }
     } catch (error) {
-        return false;
+        return false; //returning a falsy value if there's some error
     }
 }
 export {uploadOnCloudinary, deleteFromCloudinary};
