@@ -29,13 +29,15 @@ const uploadVideo = asyncHandler(async (req, res) =>{
         throw new ApiError(500, "Error while uploading the files");
     }
 
+    const duration = videoFile?.nb_frames * eval(videoFile?.video?.time_base);
+
     const video = await Video.create({
         description,
         title,
         thumbnail : thumbnail.url,
         videoFile : videoFile.url,
         owner : req.user._id,
-        duration: 0
+        duration
     })
 
     if(!video){
