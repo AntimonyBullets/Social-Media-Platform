@@ -49,4 +49,20 @@ const uploadVideo = asyncHandler(async (req, res) =>{
     .json(new ApiResponse(200, video, "Video uploaded successfully!"));
 })
 
-export { uploadVideo };
+const getVideoById = asyncHandler(async (req, res)=>{
+    const { videoId } = req.params;
+
+    const video = await Video.findById(videoId);
+
+    if(!video){
+        throw new ApiError(404, "Video not found!")
+    }
+    
+    if(!video.isPublished && !video.owner.equals(req.user._id)){
+        throw new ApiError(401, "You don't have access to this video");
+    } //throwing error if video is private and the request of getting the video is not by the owner of the video himself
+    return res
+    .status(200)
+    .json(new ApiResponse(200, video, "Video fetched successfully"));
+})
+export { uploadVideo, getVideoById };
