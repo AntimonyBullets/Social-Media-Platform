@@ -60,9 +60,54 @@ const getVideoById = asyncHandler(async (req, res)=>{
     
     if(!video.isPublished && !video.owner.equals(req.user._id)){
         throw new ApiError(401, "You don't have access to this video");
-    } //throwing error if video is private and the request of getting the video is not by the owner of the video himself
+    } //throwing error if video is private and if request of getting the video is not done by the owner himself.
     return res
     .status(200)
     .json(new ApiResponse(200, video, "Video fetched successfully"));
+});
+
+const updateVideo = asyncHandler(async (req,res)=>{
+    const { videoId } = req.params;
+
+    const {title, description} = req.body;
+
+    if(!title || !description){
+        throw new ApiError("Title and description can not be empty!")
+    }
+
+    const thumbnailLocalPath = req.file?.path;
+
+    if(!thumbnailLocalPath){
+        const video = await Video.findOneAndUpdate(
+            { _id: videoId, owner: req.user._id },
+            {
+                $set:{
+                    title,
+                    description
+                }
+            },
+            { new: true, runValidators: true }
+        );
+
+        if(!video){
+            throw new ApiError(404, "Video not found!")
+        }
+
+        return res
+        .status(200)
+        .json(new ApiResponse(200, video, "Video details updated successfully!"))
+    }
+
+    const thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
+
+    if(!thumbnail?.url){
+        throw new ApiError(500, "Some problem occured while uploading the file");
+    }
+
+
+
+
+    
+    
 })
 export { uploadVideo, getVideoById };
