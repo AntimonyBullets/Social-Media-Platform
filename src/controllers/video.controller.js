@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Video } from "../models/video.model.js";
 
 
@@ -67,12 +67,13 @@ const getVideoById = asyncHandler(async (req, res)=>{
 });
 
 const updateVideo = asyncHandler(async (req,res)=>{
+    // We'll use some better approach for this one later on
     const { videoId } = req.params;
 
     const {title, description} = req.body;
 
     if(!title || !description){
-        throw new ApiError("Title and description can not be empty!")
+        throw new ApiError(401, "Title and description can not be empty!")
     }
 
     const thumbnailLocalPath = req.file?.path;
@@ -104,10 +105,36 @@ const updateVideo = asyncHandler(async (req,res)=>{
         throw new ApiError(500, "Some problem occured while uploading the file");
     }
 
+    const video = await Video.findOneAndUpdate(
+        { _id: videoId, owner: req.user._id },
+        {
+            $set:{
+                title,
+                description,
+                thumbnail: thumbnail.url
+            }
+        },
+        {runValidators: true }
+    );
 
+    if(!video){
+        const deleteMaliciousFile = await deleteFromCloudinary(thumbnail.url);
+        throw new ApiError(404, "Video not found!")
+    }
 
+    const deleteOriginalThumbnail = await deleteFromCloudinary(video.thumbnail);
 
-    
+    if(!deleteOriginalThumbnail){
+        throw new ApiError(500, "Something went wrong while deleting previous thumbnail");
+    }
+
+    console.log(deleteOriginalThumbnail);
+
+    video.thumbnail = thumbnail.url;
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, video, "Video details updated successfully!"))
     
 })
-export { uploadVideo, getVideoById };
+export { uploadVideo, getVideoById, updateVideo };
