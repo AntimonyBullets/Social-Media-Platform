@@ -32,9 +32,15 @@ const deleteFromCloudinary = async (cloudinaryURL) =>{
         //following is the code for extracting just the filename from the cloudinary url
         const pathArr = cloudinaryURL.split("/");
         const fileNameArr = pathArr[pathArr.length - 1].split(".");
-        const fileName = fileNameArr[0];
-        const response = await cloudinary.uploader.destroy(fileName); //deleting the file
-    
+        const fileName = fileNameArr[0].trim();
+        let response = await cloudinary.uploader.destroy(fileName, { resource_type: "image"}); //deleting the file
+
+        if(response.result !== 'ok'){
+            response = await cloudinary.uploader.destroy(fileName, { resource_type: "video"});
+        }
+        if(response.result !== 'ok'){
+            response = await cloudinary.uploader.destroy(fileName, { resource_type: "raw"});
+        }
         if (response.result === 'ok') {
             return {
               success: true,
