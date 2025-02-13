@@ -16,7 +16,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
         user.refreshToken = refreshToken; //setting the refreshToken to currently generated refreshToken
 
         await user.save({ validateBeforeSave: false });
-        //saving the changes made in 'refreshToken' in the database. Here we are setting 'validateBeforeSave' to false to surpass any validations (such as 'required'), if there are any on the fields which are modified ('refreshToken' in this case).
+        //saving the changes made in 'refreshToken' in the database. Here we are setting 'validateBeforeSave' to false to surpass any validations (such as 'required'), if there are any on the fields which are modified ('refreshToken' in this case). It's not really needed here, but it's just to demonstrate what is 'validateBeforeSave'.
         return { accessToken, refreshToken };
     } catch (error) {
         throw new ApiError(500, "Something went wrong while generating the tokens.")
