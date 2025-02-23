@@ -22,7 +22,18 @@ const createTweet = asyncHandler(async(req, res)=>{
 })
 
 const getUserTweets = asyncHandler(async (req, res) => {
-    // TODO: get user tweets
+    const { userId } = req.params;
+    if (!userId) throw new ApiError(404, "Route not found!");
+
+    const tweets = await Tweet.find(
+        { owner: userId},
+        { owner: 1, content: 1, _id: 0}
+    );
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, tweets, "User's tweets fetched successfully!"))
+
 })
 
 const updateTweet = asyncHandler(async (req, res) => {
