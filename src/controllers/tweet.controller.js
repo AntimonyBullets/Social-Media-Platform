@@ -60,7 +60,15 @@ const updateTweet = asyncHandler(async (req, res) => {
 })
 
 const deleteTweet = asyncHandler(async (req, res) => {
-    //TODO: delete tweet
+    const { tweetId } = req.params;
+    if(!tweetId) throw new ApiError(404, "Route not found!");
+
+    const tweet = await Tweet.findOneAndDelete({ _id: tweetId, owner: req.user._id });
+    if(!tweet) throw new ApiError(404, "Tweet not found!");
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, tweet, "Tweet has been deleted successfully!"));
 })
 
 export {
