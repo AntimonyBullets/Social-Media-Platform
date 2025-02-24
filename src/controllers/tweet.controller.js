@@ -37,7 +37,26 @@ const getUserTweets = asyncHandler(async (req, res) => {
 })
 
 const updateTweet = asyncHandler(async (req, res) => {
-    //TODO: update tweet
+    const { tweetId } = req.params;
+    if(!tweetId) throw new ApiError(404, "Route not found!");
+
+    const { content } = req.body;
+    if(!content) throw new ApiError(400, "Content is required!")
+
+    const tweet = await Tweet.findById(tweetId);
+    
+    if(!tweet){
+        throw new ApiError(404, "Tweet not found!");
+    }
+    if(!tweet.owner.equals(req.user._id)) throw new ApiError(401, "Unauthorized access!");
+
+    tweet.content = content;
+
+    await tweet.save();
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, tweet, "Tweet updated successfully!"));
 })
 
 const deleteTweet = asyncHandler(async (req, res) => {
