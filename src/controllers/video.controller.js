@@ -3,6 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Video } from "../models/video.model.js";
+import mongoose from "mongoose";
 
 
 const uploadVideo = asyncHandler(async (req, res) =>{
@@ -52,22 +53,49 @@ const uploadVideo = asyncHandler(async (req, res) =>{
 const getVideoById = asyncHandler(async (req, res)=>{
     const { videoId } = req.params;
 
-    const video = await Video.findById(videoId);
+    const video = await Video.aggregate([
+        {
+            $match: { _id: new mongoose.Types.ObjectId(videoId) }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'owner',
+                foreignField: '_id',
+                as: 'owner',
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 1,
+                            username: 1,
+                            fullName: 1,
+                            avatar: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields: {
+                owner: {
+                    $first: "$owner"
+                }
+            }
+        }
+    ]);
+    console.log(video);
 
-    if(!video){
-        throw new ApiError(404, "Video not found!")
+    if(!video || !video.length){
+        throw new ApiError(404, "Video not found!");
     }
-    
-    if(!video.isPublished && !video.owner.equals(req.user._id)){
-        throw new ApiError(401, "You don't have access to this video");
-    } //throwing error if video is private and if request of getting the video is not done by the owner himself.
+
     return res
     .status(200)
-    .json(new ApiResponse(200, video, "Video fetched successfully"));
+    .json(new ApiResponse(200, video, "Video fetched successfully!"))
 });
 
 const updateVideo = asyncHandler(async (req,res)=>{
-    // We'll use some better approach for this one later on
+    // We'll use some better approach for this one later on (this also works completely fine)
     const { videoId } = req.params;
 
     const {title, description} = req.body;
