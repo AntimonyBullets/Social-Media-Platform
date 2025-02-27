@@ -83,7 +83,6 @@ const getVideoById = asyncHandler(async (req, res)=>{
             }
         }
     ]);
-    console.log(video);
 
     if(!video || !video.length){
         throw new ApiError(404, "Video not found!");
@@ -91,7 +90,7 @@ const getVideoById = asyncHandler(async (req, res)=>{
 
     return res
     .status(200)
-    .json(new ApiResponse(200, video, "Video fetched successfully!"))
+    .json(new ApiResponse(200, video[0], "Video fetched successfully!"))
 });
 
 const updateVideo = asyncHandler(async (req,res)=>{
