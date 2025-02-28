@@ -3,7 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Video } from "../models/video.model.js";
-import mongoose from "mongoose";
+import mongoose, { Mongoose } from "mongoose";
 
 
 const uploadVideo = asyncHandler(async (req, res) =>{
@@ -99,7 +99,7 @@ const updateVideo = asyncHandler(async (req,res)=>{
 
     const {title, description} = req.body;
 
-    if(!title || !description){
+    if(!title && !description){
         throw new ApiError(401, "Title and description can not be empty!")
     }
 
@@ -203,5 +203,46 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(new ApiResponse(200, video, "Publish status has been toggled successfully"));
-})
-export { uploadVideo, getVideoById, updateVideo, deleteVideo, togglePublishStatus };
+});
+
+// using query we will search in the database for the videos whose title matches with the query (case insensitive), this will be first stage of aggregate pipeline
+// sortBy can contain values --> 'views' or 'date', while sortType can contain 'asc' or 'dsc', this will be second stage of aggregate pipline
+// if userId is provided, we will match the owner of video with userId in the first stage itself, else will only use query in first stage
+// an aggregation object will be returned by the aggregate function, we'll use that in aggregatePaginate with options (which would contain the page number and limit);
+//the final array returned would be the array of 10 videos on the nth page, which would finally be returned.
+
+// The following API is not working properly for now, we'll fix it later.
+const searchVideos = asyncHandler(async (req, res) => {
+    console.log(req?.query);
+    const { page = 1, limit = 10, query = "", sortBy = "date", sortType = "dsc", userId } = req.query;
+    console.log(userId)
+
+    if(!query.trim()) return res.status(200).json(new ApiResponse(200, {}, "Videos have been fetched successfully!"));
+
+    const matchStage = {
+        $match: {
+            title : { $regex: query, $options: "i"}
+        }
+    };
+    if(mongoose.isValidObjectId(userId)) matchStage.$match.owner = new mongoose.Types.ObjectId(userId);
+
+    const sortField = sortBy === 'views'? 'views' : 'createdAt';
+    const sortOrder = sortType === 'asc' ? 1 : -1;
+    const sortStage = {
+        $sort: {
+            [sortField] : sortOrder
+        }
+    }
+
+    const aggregationPipeline = Video.aggregate([matchStage, sortStage]);
+    const options = {page, limit};
+
+    const response = await Video.aggregatePaginate(aggregationPipeline, options);
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, response, "Videos have been fetched successfully!"))
+    
+});
+
+export { uploadVideo, getVideoById, updateVideo, deleteVideo, togglePublishStatus, searchVideos };
