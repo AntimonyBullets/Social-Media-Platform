@@ -214,7 +214,7 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
 // The following API is not working properly for now, we'll fix it later.
 const searchVideos = asyncHandler(async (req, res) => {
     console.log(req?.query);
-    const { page = 1, limit = 10, query = "", sortBy = "date", sortType = "dsc", userId } = req.query;
+    const { page = 1, limit = 10, query = "", sortBy = "date", sortType = "dsc", userId} = req.query;
     console.log(userId)
 
     if(!query.trim()) return res.status(200).json(new ApiResponse(200, {}, "Videos have been fetched successfully!"));
@@ -224,7 +224,9 @@ const searchVideos = asyncHandler(async (req, res) => {
             title : { $regex: query, $options: "i"}
         }
     };
-    if(mongoose.isValidObjectId(userId)) matchStage.$match.owner = new mongoose.Types.ObjectId(userId);
+    if(userId && mongoose.isValidObjectId(userId)) {
+        matchStage.$match.owner = new mongoose.Types.ObjectId(userId);
+    }
 
     const sortField = sortBy === 'views'? 'views' : 'createdAt';
     const sortOrder = sortType === 'asc' ? 1 : -1;
