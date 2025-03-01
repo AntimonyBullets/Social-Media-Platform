@@ -23,11 +23,14 @@ app.use(cookieParser());
 import userRouter from './routes/user.route.js';
 import videoRouter from './routes/video.route.js';
 import tweetRouter from './routes/tweet.route.js';
+import subscriptionRouter from './routes/subscription.route.js'
 
 app.use('/api/v1/users', userRouter); //Here app.use() middleware is used to transfer control to userRouter in the user.route.js file if a route extending /api/v1/users (for example /api/v1/users/register) is hit
 
 app.use('/api/v1/videos', videoRouter);
 
 app.use('/api/v1/tweets', tweetRouter);
+
+app.use('/api/v1/subscriptions', subscriptionRouter);
 
 export {app};
