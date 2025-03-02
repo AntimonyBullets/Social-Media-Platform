@@ -205,41 +205,64 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, video, "Publish status has been toggled successfully"));
 });
 
-// using query we will search in the database for the videos whose title matches with the query (case insensitive), this will be first stage of aggregate pipeline
-// sortBy can contain values --> 'views' or 'date', while sortType can contain 'asc' or 'dsc', this will be second stage of aggregate pipline
-// if userId is provided, we will match the owner of video with userId in the first stage itself, else will only use query in first stage
-// an aggregation object will be returned by the aggregate function, we'll use that in aggregatePaginate with options (which would contain the page number and limit);
-//the final array returned would be the array of 10 videos on the nth page, which would finally be returned.
-
-// The following API is not working properly for now, we'll fix it later.
 const searchVideos = asyncHandler(async (req, res) => {
-    console.log(req?.query);
-    const { page = 1, limit = 10, query = "", sortBy = "date", sortType = "dsc", userId} = req.query;
-    console.log(userId)
+    const { page = 1, limit = 2, query = "", sortBy = "date", sortType = "dsc", userId} = req.query;
 
-    if(!query.trim()) return res.status(200).json(new ApiResponse(200, {}, "Videos have been fetched successfully!"));
+    if(!query.trim()) throw new ApiError(400, "No query provided");
+
+    if(page<1 || limit < 1) throw new ApiError(400, "page/limit must have a value greater than or equal to 1");
+
+    if(page>limit) throw new ApiError(404, "This page does not exist!")
 
     const matchStage = {
         $match: {
-            title : { $regex: query, $options: "i"}
+            $or: [
+                { title : { $regex: query, $options: "i"} }, // $regex for searching the string 'query' in title and $options for setting case-insensitive search
+                { description: { $regex: query, $options: "i"} }
+            ]
         }
     };
     if(userId && mongoose.isValidObjectId(userId)) {
-        matchStage.$match.owner = new mongoose.Types.ObjectId(userId);
+        matchStage.$match.owner = new mongoose.Types.ObjectId(userId); 
+        //match users on the basis of 'userId' only if that filter is provided.
     }
 
     const sortField = sortBy === 'views'? 'views' : 'createdAt';
     const sortOrder = sortType === 'asc' ? 1 : -1;
     const sortStage = {
         $sort: {
-            [sortField] : sortOrder
+            [sortField] : sortOrder //for sorting the 'sortField' (as provided by client) on the basis of 'sortOrder' (as provided by client)
         }
     }
 
-    const aggregationPipeline = Video.aggregate([matchStage, sortStage]);
+    const lookupStage = {
+        $lookup:{
+            from: 'users',
+            localField: 'owner',
+            foreignField: '_id',
+            as: 'owner',
+            pipeline:[
+                {
+                    $project:{
+                        username: 1,
+                        fullName: 1,
+                        avatar: 1
+                    }
+                }
+            ]
+        }
+    }
+
+    const addFieldStage = {
+        $addFields: {
+            owner: {$first: '$owner'}
+        }
+    }
+
+    const aggregationPipeline = Video.aggregate([matchStage, sortStage, lookupStage, addFieldStage]);
     const options = {page, limit};
 
-    const response = await Video.aggregatePaginate(aggregationPipeline, options);
+    const response = await Video.aggregatePaginate(aggregationPipeline, options);//for pagination of searched documents (divides the total documents retrieved in pages, where each page can contain a maximum of 'limit' no. of documents)
 
     return res
     .status(200)
