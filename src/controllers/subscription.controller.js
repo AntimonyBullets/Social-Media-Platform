@@ -71,7 +71,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 // controller to return subscriber list of a channel
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     const {channelId} = req.params;
-    if(!mongoose.isValidObjectId(channelId)) throw new ApiError(404, "Channel not found!");
+    if(!channelId || !mongoose.isValidObjectId(channelId)) throw new ApiError(404, "Channel not found!");
 
     const channel = await User.aggregate([
         {
@@ -136,7 +136,68 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
-    const { subscriberId } = req.params
+    const { subscriberId } = req.params;
+
+    if(!subscriberId || !mongoose.isValidObjectId(subscriberId)) throw new ApiError(400, "User not found!");
+
+    const subscriber = await User.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(subscriberId)
+            }
+        },
+        {
+            $lookup:{
+                from: 'subscriptions',
+                localField: '_id',
+                foreignField: 'subscriber',
+                as: 'subscribedTo',
+                pipeline:[
+                    {
+                        $lookup:{
+                            from: 'users',
+                            localField: 'channel',
+                            foreignField: '_id',
+                            as: 'channel',
+                            pipeline:[
+                                {
+                                    $project:{
+                                        username:1,
+                                        fullName: 1,
+                                        avatar: 1
+                                    }
+                                }
+                            ]
+                        },
+                    },
+                    {
+                        $addFields:{
+                            channel: { $first: '$channel' }
+                        }
+                    },
+                    {
+                        $project:{
+                            channel: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $project:{
+                username: 1,
+                fullName: 1,
+                avatar: 1,
+                subscribedTo: 1
+            }
+        }
+    ]);
+
+    if(!subscriber.length) throw new ApiError(404, "User does not exist");
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, subscriber[0], "Subscriptions fetched successfully!"))
 })
 
 export {
