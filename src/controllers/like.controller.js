@@ -1,12 +1,18 @@
-import mongoose, {isValidObjectId, mongo} from "mongoose"
-import {Like} from "../models/like.model.js"
-import {ApiError} from "../utils/ApiError.js"
-import {ApiResponse} from "../utils/ApiResponse.js"
-import {asyncHandler} from "../utils/asyncHandler.js"
+import mongoose, {isValidObjectId, mongo} from "mongoose";
+import {Like} from "../models/like.model.js";
+import { Tweet } from "../models/tweet.model.js";
+import {Comment} from "../models/comment.model.js";
+import { Video } from "../models/video.model.js"
+import {ApiError} from "../utils/ApiError.js";
+import {ApiResponse} from "../utils/ApiResponse.js";
+import {asyncHandler} from "../utils/asyncHandler.js";
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
     const {videoId} = req.params;
     if(!videoId || !mongoose.isValidObjectId(videoId)) throw new ApiError(404, "Video not found!");
+
+    const video = await Video.findById(video);
+    if(!video) throw new ApiError(404, "Video does not exist");
 
     const aggregationPipeline = [
         {
@@ -111,6 +117,9 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     const {commentId} = req.params
     if(!commentId || !mongoose.isValidObjectId(commentId)) throw new ApiError(404, "Comment not found!");
 
+    const comment = await Comment.findById(commentId);
+    if(!comment) throw new ApiError(404, "Comment does not exist")
+
     const commentLike = await Like.findOne({comment: commentId});
 
     if(!commentLike){
@@ -134,6 +143,9 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 const toggleTweetLike = asyncHandler(async (req, res) => {
     const {tweetId} = req.params;
     if(!tweetId || !mongoose.isValidObjectId(tweetId)) throw new ApiError(404, "Tweet not found!");
+
+    const tweet = await Tweet.findById(tweetId);
+    if(!tweet) throw new ApiError(404, "Tweet does not exist");
 
     const tweetLike = await Like.findOne({tweet: tweetId});
 

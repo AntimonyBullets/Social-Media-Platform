@@ -11,7 +11,13 @@ const toggleSubscription = asyncHandler(async (req, res) => {
     //find the subscription document by using findOne and using filters as channel --> channelId and subscriber --> req.user._id.
     //if the document exists, use findOneAndDelete/deleteOne to delete the document. If it does not, use Subscription.create() to create a document.
     //return the response according to the conditon of pre-existence of document or not.
-    if(!mongoose.isValidObjectId(channelId)) throw new ApiError(404, "Channel not found");
+    if(!channelId || !mongoose.isValidObjectId(channelId)) throw new ApiError(404, "Channel not found");
+
+    const channel = await User.findById(channelId);
+    if(!channel) throw new ApiError(404, "Channel does not exist");
+
+    if(req.user._id.equals(channelId)) throw new ApiError(400, "User can not subscribe himself/herself");
+
     const aggregationPipeline = [
         { 
             $match: {
