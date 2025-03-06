@@ -11,13 +11,14 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     const {videoId} = req.params;
     if(!videoId || !mongoose.isValidObjectId(videoId)) throw new ApiError(404, "Video not found!");
 
-    const video = await Video.findById(video);
+    const video = await Video.findById(videoId);
     if(!video) throw new ApiError(404, "Video does not exist");
 
     const aggregationPipeline = [
         {
             $match: {
-                video: new mongoose.Types.ObjectId(videoId)
+                video: new mongoose.Types.ObjectId(videoId),
+                likedBy: req.user._id
             }
         },
         {
@@ -120,7 +121,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     const comment = await Comment.findById(commentId);
     if(!comment) throw new ApiError(404, "Comment does not exist")
 
-    const commentLike = await Like.findOne({comment: commentId});
+    const commentLike = await Like.findOne({comment: commentId, likedBy: req.user._id});
 
     if(!commentLike){
         const createCommentLike = await Like.create({
@@ -147,7 +148,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     const tweet = await Tweet.findById(tweetId);
     if(!tweet) throw new ApiError(404, "Tweet does not exist");
 
-    const tweetLike = await Like.findOne({tweet: tweetId});
+    const tweetLike = await Like.findOne({tweet: tweetId, likedBy: req.user._id});
 
     if(!tweetLike){
         const createTweetLike = await Like.create({
@@ -169,6 +170,61 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 
 const getLikedVideos = asyncHandler(async (req, res) => {
     //TODO: get all liked videos
+    console.log(req.user._id);
+    const userLikedVideos = await Like.aggregate([
+        {
+            $match: {
+                likedBy: req.user._id, 
+                video : {$exists: true}
+            }
+        },
+        {
+            $lookup: {
+                from: 'videos',
+                localField: 'video',
+                foreignField: '_id',
+                as: 'video',
+                pipeline:[
+                    {
+                        $lookup:{
+                            from: 'users',
+                            localField: 'owner',
+                            foreignField: '_id',
+                            as: 'owner',
+                            pipeline:[
+                                {
+                                    $project:{
+                                        username: 1,
+                                        avatar: 1,
+                                        fullName: 1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $project:{
+                            thumbnail: 1,
+                            title: 1,
+                            views: 1,
+                            owner: {$first: '$owner'}
+                        }
+                    }
+                ]
+            }
+        }, 
+        {
+            $project:{
+                video: {$first : '$video'}
+            }
+        }
+    ]);
+
+    if(!userLikedVideos.length) return res.status(200).json(new ApiResponse(200, [], "Liked Videos fetched successfully!"));
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, userLikedVideos, "Liked Videos fetched successfully!"));
 })
 
 export {
