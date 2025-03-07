@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose, { mongo } from "mongoose"
 import {Comment} from "../models/comment.model.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
@@ -6,14 +6,58 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 import { Video } from "../models/video.model.js"
 
 const getVideoComments = asyncHandler(async (req, res) => {
-    //TODO: get all comments for a video
     const {videoId} = req.params;
-    const {page = 1, limit = 10} = req.query;
+    if(!videoId || !mongoose.isValidObjectId(videoId)) throw new ApiError(404, "Video not found!");
+    
+    const {page = 1, limit = 2} = req.query;
 
+
+    if(page < 1 || page > limit) throw new ApiError(400, "Page not found!");
+    if(limit < 1) throw new ApiError(400, "Limit can't be less than 1")
+
+    const aggregationPipeline = Comment.aggregate([
+        {
+            $match: {
+                video: new mongoose.Types.ObjectId(videoId)
+            }
+        },
+        {
+            $lookup:{
+                from: 'users',
+                localField: 'owner',
+                foreignField: '_id',
+                as: 'owner',
+                pipeline:[
+                    {
+                        $project:{
+                            username: 1,
+                            fullName: 1,
+                            avatar: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields:{
+                owner: { $first: '$owner'}
+            }
+        }
+    ]);
+
+    const options = {
+        page,
+        limit
+    };
+
+    const videoComments = await Comment.aggregatePaginate(aggregationPipeline, options);
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, videoComments, "Comments on the video fetched successfully!"));
 })
 
 const addComment = asyncHandler(async (req, res) => {
-    // TODO: add a comment to a video
     const {videoId} = req.params;
     if(!videoId || !mongoose.isValidObjectId(videoId)) throw new ApiError(404, "Video not found!");
 
