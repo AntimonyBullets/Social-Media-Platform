@@ -27,6 +27,8 @@ import subscriptionRouter from './routes/subscription.route.js';
 import likeRouter from './routes/like.route.js';
 import commentRouter from './routes/comment.route.js';
 import playlistRouter from './routes/playlist.route.js';
+import dashboardRouter from './routes/dashboard.route.js';
+import healthcheckRouter from './routes/healthcheck.route.js';
 
 app.use('/api/v1/users', userRouter); //Here app.use() middleware is used to transfer control to userRouter in the user.route.js file if a route extending /api/v1/users (for example /api/v1/users/register) is hit
 
@@ -41,5 +43,9 @@ app.use('/api/v1/likes', likeRouter);
 app.use('/api/v1/comments', commentRouter);
 
 app.use('/api/v1/playlists', playlistRouter);
+
+app.use('/api/v1/dashboard', dashboardRouter);
+
+app.use('/api/v1/healthcheck', healthcheckRouter)
 
 export {app};
