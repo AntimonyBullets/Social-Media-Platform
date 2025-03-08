@@ -4,6 +4,7 @@ import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
 import { Video } from "../models/video.model.js"
+import { User } from "../models/user.model.js"
 
 
 const createPlaylist = asyncHandler(async (req, res) => {
@@ -32,12 +33,36 @@ const createPlaylist = asyncHandler(async (req, res) => {
 
 const getUserPlaylists = asyncHandler(async (req, res) => {
     const {userId} = req.params
-    //TODO: get user playlists
+    if(!userId || !mongoose.isValidObjectId(userId)) throw new ApiError(404, "Playlist not found!");
+
+    const user = await User.findById(userId);
+    if(!user) throw new ApiError(404, "User does not exist")
+
+    const playlists = await Playlist.find({ owner: userId})
+    .populate('owner', 'username fullName avatar');
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, playlists, "User's playlists fetched successfully!"))
 })
 
 const getPlaylistById = asyncHandler(async (req, res) => {
     const {playlistId} = req.params
-    //TODO: get playlist by id
+    if(!playlistId || !mongoose.isValidObjectId(playlistId)) throw new ApiError(404, "Playlist not found!");
+
+    const playlist = await Playlist.findOne({_id: playlistId})
+    .populate('owner', 'username fullName avatar')
+    .populate({
+        path: 'videos',
+        select: 'thumbnail owner views title',
+        populate: { path: 'owner', select: "username fullName avatar"}
+    });
+
+    if(!playlist) throw new ApiError(404, "Playlist does not exist or Unauthorized access");
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, playlist, "Playlist updated successfully!"));
 })
 
 const addVideoToPlaylist = asyncHandler(async (req, res) => {
@@ -123,7 +148,14 @@ const updatePlaylist = asyncHandler(async (req, res) => {
 
     if(!name && !description) throw new ApiError(400, "No modifications done (Neither of description and name has been changed");
 
-    const playlist = await Playlist.findOne({_id: playlistId, owner: req.user._id});
+    const playlist = await Playlist.findOne({_id: playlistId, owner: req.user._id})
+    .populate('owner', 'username fullName avatar')
+    .populate({
+        path: 'videos',
+        select: 'thumbnail owner views title',
+        populate: { path: 'owner', select: "username fullName avatar"}
+    });
+
     if(!playlist) throw new ApiError(404, "Playlist does not exist or Unauthorized access");
 
 
