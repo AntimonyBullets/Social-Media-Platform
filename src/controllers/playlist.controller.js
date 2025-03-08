@@ -104,14 +104,37 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
 })
 
 const deletePlaylist = asyncHandler(async (req, res) => {
-    const {playlistId} = req.params
-    // TODO: delete playlist
+    const {playlistId} = req.params;
+    if(!playlistId || !mongoose.isValidObjectId(playlistId)) throw new ApiError(404, "Playlist not found!");
+
+    const playlist = await Playlist.findOneAndDelete( { _id: playlistId, owner: req.user._id} );
+
+    if(!playlist) throw new ApiError(404, "Playlist does not exist or Unauthorized access");
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, playlist, "Playlist deleted successfully!"))  
 })
 
 const updatePlaylist = asyncHandler(async (req, res) => {
     const {playlistId} = req.params
     const {name, description} = req.body
-    //TODO: update playlist
+    if(!playlistId || !mongoose.isValidObjectId(playlistId)) throw new ApiError(404, "Playlist not found!");
+
+    if(!name && !description) throw new ApiError(400, "No modifications done (Neither of description and name has been changed");
+
+    const playlist = await Playlist.findOne({_id: playlistId, owner: req.user._id});
+    if(!playlist) throw new ApiError(404, "Playlist does not exist or Unauthorized access");
+
+
+    if(name?.trim()) playlist.name = name;
+    if(description?.trim()) playlist.description = description;
+
+    await playlist.save({validateBeforeSave: false});
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, playlist, "Playlist updated successfully!"));
 })
 
 export {
