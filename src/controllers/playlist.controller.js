@@ -71,8 +71,35 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
 })
 
 const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
-    const {playlistId, videoId} = req.params
-    // TODO: remove video from playlist
+    const {playlistId, videoId} = req.params;
+    if(!playlistId || !mongoose.isValidObjectId(playlistId)) throw new ApiError(404, "Playlist not found!");
+
+    if(!videoId || !mongoose.isValidObjectId(videoId)) throw new ApiError(404, "Video not found!");
+    
+    const playlist = await Playlist.findOne({_id: playlistId, owner: req.user._id});
+    if(!playlist) throw new ApiError(404, "Playlist not found or Unauthorized access");
+
+    if(!playlist.videos.some((vid) => vid.equals(videoId))){
+        throw new ApiError(404, "Video does not exist in the playlist!")
+    }
+
+    const finalPlaylist = await Playlist.findOneAndUpdate(
+        { _id: playlistId },
+        { $pull: { videos: videoId } },
+        {returnDocument: 'after'}
+    )
+    .populate('owner', 'username fullName avatar')
+    .populate({
+        path: 'videos',
+        select: 'thumbnail title views owner',
+        populate:{ path: 'owner', select: 'username fullName avatar' }
+    });
+
+    if(!finalPlaylist) throw new ApiError(500, "Some error occurred while updating the playlist");
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, finalPlaylist, "Video removed from the playlist successfully!"))
 
 })
 
