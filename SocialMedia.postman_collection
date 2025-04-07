@@ -83,11 +83,17 @@
 							}
 						},
 						"url": {
-							"raw": "{{server}}/login",
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/users/login",
+							"protocol": "https",
 							"host": [
-								"{{server}}"
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
 							],
 							"path": [
+								"api",
+								"v1",
+								"users",
 								"login"
 							]
 						}
