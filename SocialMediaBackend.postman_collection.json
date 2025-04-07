@@ -1,0 +1,1262 @@
+{
+	"info": {
+		"_postman_id": "0b20cde2-1fe7-49c5-80ff-9cd954ea09b6",
+		"name": "SocialMediaBackend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27199425"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "fullName",
+									"value": "User Second",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "userSecond",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "user@second.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "secondY",
+									"type": "text"
+								},
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "/C:/Users/twopi/Downloads/JavaTextEditor.png"
+								},
+								{
+									"key": "coverImage",
+									"type": "file",
+									"src": "/C:/Users/twopi/OneDrive/Desktop/coverImage.jpg",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/users/register",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"second@user.com\",\r\n    \"password\":\"secondX\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}/login",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/users/logout",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh-token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/users/refresh-token",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"refresh-token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "change-password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/users/change-password",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-user",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/users/get-user",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"get-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-account",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullName\" : \"Second User\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/users/update-account",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"update-account"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-avatar",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/users/update-avatar",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"update-avatar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-coverImage",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "coverImage",
+									"type": "file",
+									"src": "/C:/Users/twopi/OneDrive/Desktop/AI testing/claude/OIG4.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/users/update-coverImage",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"update-coverImage"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "channel-profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/users/c/thirduser",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"c",
+								"thirduser"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "watch-history",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/users/history",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"history"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "video",
+			"item": [
+				{
+					"name": "upload",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "description",
+									"value": "First video description",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "First video title",
+									"type": "text"
+								},
+								{
+									"key": "thumbnail",
+									"type": "file",
+									"src": "/C:/Users/twopi/OneDrive/Desktop/AI testing/claude/OIG4.q07rG.jpg"
+								},
+								{
+									"key": "videoFile",
+									"type": "file",
+									"src": "/C:/Users/twopi/OneDrive/Desktop/5secVideo.mp4"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/videos/upload",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"videos",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-video",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/videos/67ada99ec484449da8dea727",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"videos",
+								"67ada99ec484449da8dea727"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-video",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Changes in title",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Changes in desc",
+									"type": "text"
+								},
+								{
+									"key": "thumbnail",
+									"type": "file",
+									"src": "/C:/Users/twopi/OneDrive/Desktop/AI testing/claude/OIG4.q07rG.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/videos/67a74fa92099f2184d4fb276",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"videos",
+								"67a74fa92099f2184d4fb276"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-video",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/videos/67acc1b8ee6d955e870d4cc7",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"videos",
+								"67acc1b8ee6d955e870d4cc7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "toggle-publish-status",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/videos/67ada99ec484449da8dea727",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"videos",
+								"67ada99ec484449da8dea727"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search-videos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/videos/search?query=video&userId=67925a54f4c92d57602996cc&page=2",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"videos",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "video"
+								},
+								{
+									"key": "userId",
+									"value": "67925a54f4c92d57602996cc"
+								},
+								{
+									"key": "page",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "tweet",
+			"item": [
+				{
+					"name": "upload",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\": \"Another tweet!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/tweets/",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tweets",
+								""
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-all-tweets",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/tweets/user/67925a54f4c92d57602996cc",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tweets",
+								"user",
+								"67925a54f4c92d57602996cc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-tweet",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\": \"Content updated!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/tweets/67baf260deab94a111aba50d",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tweets",
+								"67baf260deab94a111aba50d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-tweet",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/tweets/67bc0a62b5f6dee165e555fa",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"tweets",
+								"67bc0a62b5f6dee165e555fa"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "subscription",
+			"item": [
+				{
+					"name": "toggle-subscription",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/subscriptions/c/678bd929ca53127e7d041965",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subscriptions",
+								"c",
+								"678bd929ca53127e7d041965"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-channel-subscribers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/subscriptions/c/67925a54f4c92d57602996cc",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subscriptions",
+								"c",
+								"67925a54f4c92d57602996cc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-user-subscriptions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/subscriptions/u/67925a54f4c92d57602996cc",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"subscriptions",
+								"u",
+								"67925a54f4c92d57602996cc"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "like",
+			"item": [
+				{
+					"name": "toggle-video-like",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/likes/toggle/v/67c17172c5116da2c6b3bf65",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"likes",
+								"toggle",
+								"v",
+								"67c17172c5116da2c6b3bf65"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "toggle-comment-like",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/likes/toggle/c/67c170c9454cfc5147a0b317",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"likes",
+								"toggle",
+								"c",
+								"67c170c9454cfc5147a0b317"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "toggle-tweet-like",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/likes/toggle/t/67baed4adeab94a111aba503",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"likes",
+								"toggle",
+								"t",
+								"67baed4adeab94a111aba503"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-liked-videos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/likes/videos",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"likes",
+								"videos"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "comment",
+			"item": [
+				{
+					"name": "post-comment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\": \"Here's the comment\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/comments/67c170c9454cfc5147a0b317",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"comments",
+								"67c170c9454cfc5147a0b317"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-comment",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"content\": \"The content has been changed\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/comments/c/67c9db8def4cfeed495b9abf",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"comments",
+								"c",
+								"67c9db8def4cfeed495b9abf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-comment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/comments/c/67c9db8def4cfeed495b9abf",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"comments",
+								"c",
+								"67c9db8def4cfeed495b9abf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-video-comments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/comments/67c170c9454cfc5147a0b317?page=2&limit=3",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"comments",
+								"67c170c9454cfc5147a0b317"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "2"
+								},
+								{
+									"key": "limit",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "playlist",
+			"item": [
+				{
+					"name": "create-playlist",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Another playlist\",\r\n    \"description\" : \"description of playlist\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/playlists/",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"playlists",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add-video-to-playlist",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/playlists/add/67ada99ec484449da8dea727/67cb207075fc5fbd07d39958",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"playlists",
+								"add",
+								"67ada99ec484449da8dea727",
+								"67cb207075fc5fbd07d39958"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "remove-video-from-playlist",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/playlists/remove/67ada99ec484449da8dea727/67cb207075fc5fbd07d39958",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"playlists",
+								"remove",
+								"67ada99ec484449da8dea727",
+								"67cb207075fc5fbd07d39958"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-playlist",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/playlists/67cb201275fc5fbd07d39953",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"playlists",
+								"67cb201275fc5fbd07d39953"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-playlist",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Changed the name\",\r\n    \"description\" : \"Changed the description\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/playlists/67cb207075fc5fbd07d39958",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"playlists",
+								"67cb207075fc5fbd07d39958"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-playlist",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/playlists/67cb207075fc5fbd07d39958",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"playlists",
+								"67cb207075fc5fbd07d39958"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-user-playlists",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/playlists/user/67ab6ef1cb2c058f2b2bfe56",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"playlists",
+								"user",
+								"67ab6ef1cb2c058f2b2bfe56"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "dashboard",
+			"item": [
+				{
+					"name": "get-channel-stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/dashboard/stats",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboard",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-channel-videos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/dashboard/videos",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"dashboard",
+								"videos"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "healthcheck",
+			"item": [
+				{
+					"name": "health-check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://social-media-platform-wczr.onrender.com/api/v1/healthcheck/",
+							"protocol": "https",
+							"host": [
+								"social-media-platform-wczr",
+								"onrender",
+								"com"
+							],
+							"path": [
+								"api",
+								"v1",
+								"healthcheck",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
